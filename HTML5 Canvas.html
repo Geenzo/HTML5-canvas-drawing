@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"> Your browser doesn't support canvas!</canvas>
+<div id="palette">
+	<h1>Palette</h1>
+	<p>Pen Size</p>
+	<input type="range" id="pensize" name="pensize" min="0" max="50" value="5"><br>		
+
+	<p>Opacity</p>
+	<input type="range" id="opacityscale" name="opacityscale" min="0" max="1"  step="0.2" value="1"><br>
+	
+	<p>Colour</p>
+	<input type="color" id="colorpicker" name="colorpicker" ><br><br>
+
+	<label>Rainbow Stroke!</label>
+	<input type="checkbox" id="Rainbow" name="Rainbow" checked=""><br>		
+
+	<label>Shadow</label>
+	<input type="checkbox" id="shadow" name="shadow"><br>	
+
+	<br>
+	<input type="button" id="clear" value="clear">
+</div>
+<script>
+
+const canvas = document.querySelector('#draw');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx.strokeStyle = '#BADA55';
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
+ctx.lineWidth = 5;
+
+
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let hue = 0;
+
+let clear = document.querySelector('#clear');
+let opacityscale = document.querySelector('#opacityscale');
+let colorpicker = document.querySelector('#colorpicker');
+
+//event listeners
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', () => isDrawing = false);
+canvas.addEventListener('mouseout', () => isDrawing = false);
+
+pensize.addEventListener('change', changePen);
+shadow.addEventListener('change', changeShadow);
+opacityscale.addEventListener('change', changeOpacity);
+clear.addEventListener('click', ClearCanvas);
+colorpicker.addEventListener('change', changeColor);
+
+//end of event listeners
+
+//JavaScript for palette
+
+//Clear Canvas button
+function ClearCanvas() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+//end of Clear Canvas button
+
+//for changing stroke of pen
+
+function changePen() {
+	let pensize = document.querySelector('#pensize');
+	let currentsize = pensize.value;
+
+	ctx.lineWidth = currentsize;
+}
+//end of changing stroke of pen
+
+//Chaning stroke color
+function changeColor() {
+	ctx.strokeStyle = colorpicker.value;
+	
+	if (Rainbow.checked) {
+		document.querySelector('#Rainbow').click();
+	}
+}
+//end changing stroke color
+
+//Changing stroke Opacity of pen
+
+function changeOpacity() {
+	let currentopacity = opacityscale.value;
+	ctx.globalAlpha = currentopacity; // between 0 and 1
+}
+//end of changing stroke Opacity of pen
+
+//check for shadow checkbox
+
+function changeShadow() {
+	let shadow = document.querySelector('#shadow');
+	if (shadow.checked) {
+		ctx.shadowColor = '#999';
+		ctx.shadowBlur = 15;
+		ctx.shadowOffsetX = 15;
+		ctx.shadowOffsetY = 15;
+	} else {
+		ctx.shadowColor = '#999';
+		ctx.shadowBlur = 0;
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+	}
+}
+//end of check for shadow checkbox
+
+function draw(e) {
+	if(!isDrawing) return; // stop the En from running when they are not moused down
+	console.log(e);
+
+
+	ctx.beginPath();
+	//start from
+	ctx.moveTo(lastX, lastY);
+	// go to
+	ctx.lineTo(e.offsetX, e.offsetY);
+	ctx.stroke();
+	lastX = e.offsetX;
+	lastY = e.offsetY;
+
+	let Rainbow = document.querySelector('#Rainbow');
+	if (Rainbow.checked) {
+	ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+	hue++;	
+	}
+}
+
+canvas.addEventListener('mousedown', (e) => {
+	isDrawing = true;
+	[lastX, lastY] = [e.offsetX, e.offsetY];
+});
+
+
+</script>
+
+<style>
+  html, body {
+    margin:0;
+    font-family: sans-serif;
+    background-color: #FB1;
+  }
+
+  #draw {
+  	flex: auto;
+  	border: 5px solid black;
+  	background-color: white;
+  }
+
+  #palette {
+  	align-content: center;
+  	margin-top: -27px;
+  	background-color: #FB1;
+  	color: #0D355A;
+  }
+
+  #palette label {
+  	font-weight: bold;
+  } 
+
+  #palette p {
+  	font-weight: bold;
+  }
+
+</style>
+
+</body>
+</html>
